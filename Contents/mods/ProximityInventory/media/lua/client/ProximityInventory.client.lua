@@ -45,7 +45,7 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 	if container:getType() == "floor" then
 		localContainer = ISInventoryPage.GetLocalContainer(self.player)
 		local title = "Proximity Inventory"
-		local containerButton = self:addContainerButton(localContainer, getTexture("media/ui/Panel_Icon_Gear.png"), title, title)
+		local containerButton = self:addContainerButton(localContainer, getTexture("media/ui/ProximityInventory.png"), title, title)
 		containerButton.capacity = 0
 	end
 
