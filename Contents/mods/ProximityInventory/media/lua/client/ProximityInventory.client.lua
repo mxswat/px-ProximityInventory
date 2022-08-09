@@ -7,6 +7,8 @@ require "ISUI/ISLayoutManager"
 require "Definitions/ContainerButtonIcons"
 require "defines"
 
+local inventoryIcon = getTexture("media/ui/ProximityInventory.png")
+
 function ISInventoryPage.GetLocalContainer(playerNum)
 	if ISInventoryPage.localContainer == nil then
 		ISInventoryPage.localContainer = {}
@@ -30,24 +32,33 @@ function ISInventoryPage.GetFloorContainer(playerNum)
 	return old_ISInventoryPage_GetFloorContainer(playerNum)
 end
 
+ISInventoryPage.canInjectButton = true;
+
 local old_ISInventoryPage_addContainerButton = ISInventoryPage.addContainerButton
 function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
-	local result = old_ISInventoryPage_addContainerButton(self, container, texture, name, tooltip)
+	if self.onCharacter then
+		return old_ISInventoryPage_addContainerButton(self, container, texture, name, tooltip)
+	end
 	
 	local localContainer = ISInventoryPage.GetLocalContainer(self.player)
+	if ISInventoryPage.canInjectButton then
+		ISInventoryPage.canInjectButton = false
 
-	if not self.onCharacter and container:getType() ~= "local" then
+		local title = "Proximity Inventory"
+		local containerButton = self:addContainerButton(localContainer, inventoryIcon, title, title)
+		containerButton.capacity = 0
+	end
+
+	if container:getType() ~= "local" then
 		local localItems = localContainer:getItems()
 		local items = container:getItems()
 		localItems:addAll(items)
 	end
 
 	if container:getType() == "floor" then
-		localContainer = ISInventoryPage.GetLocalContainer(self.player)
-		local title = "Proximity Inventory"
-		local containerButton = self:addContainerButton(localContainer, getTexture("media/ui/ProximityInventory.png"), title, title)
-		containerButton.capacity = 0
+		ISInventoryPage.canInjectButton = true
 	end
 
-	return result
+	-- can't cache the result, otherwise the prox inv won't be the first item
+	return old_ISInventoryPage_addContainerButton(self, container, texture, name, tooltip)
 end
