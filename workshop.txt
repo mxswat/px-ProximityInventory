@@ -1,0 +1,5 @@
+version=1
+title=Proximity Inventory
+description=This is the description of Proximity Inventory.
+tags=
+visibility=public
