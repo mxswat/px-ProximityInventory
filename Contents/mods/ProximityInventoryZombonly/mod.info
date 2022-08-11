@@ -1,0 +1,6 @@
+name=Proximity Inventory Zombonly
+id=ProximityInventoryZombonly
+description=Proximity Inventory Zombie corspe only mode
+poster=poster.png
+icon=icon.png
+require=ProximityInventory

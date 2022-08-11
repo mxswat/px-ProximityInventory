@@ -24,6 +24,8 @@ ProximityInventory.bannedTypes = {
 ProximityInventory.canBeAdded = function (container)
 	-- Do not allow if it's a stove or washer or similiar "Active things"
 	-- It can cause issues like the item stops cooking or stops drying
+
+	print(container:getType())
 	return not ProximityInventory.bannedTypes[container:getType()]
 end
 
