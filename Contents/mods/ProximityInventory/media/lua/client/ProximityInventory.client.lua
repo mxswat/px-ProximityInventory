@@ -9,6 +9,18 @@ require "defines"
 
 local inventoryIcon = getTexture("media/ui/ProximityInventory.png")
 
+ProximityInventory = {}
+ProximityInventory.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
+ProximityInventory.canBeAdded = function (container)
+	-- Do not allow if it's an active stove or washer or similiar "Active things"
+	-- It can cause issues like the item stops cooking or stops drying
+	local object = container:getParent()
+	if not object then return true end
+	local result = object.isActivated and object:isActivated()
+	result = result or object.Activated and object:Activated()
+	return not result
+end
+
 function ISInventoryPage.GetLocalContainer(playerNum)
 	if ISInventoryPage.localContainer == nil then
 		ISInventoryPage.localContainer = {}
@@ -49,7 +61,7 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 		containerButton.capacity = 0
 	end
 
-	if container:getType() ~= "local" then
+	if container:getType() ~= "local" and ProximityInventory.canBeAdded(container) then
 		local localItems = localContainer:getItems()
 		local items = container:getItems()
 		localItems:addAll(items)
