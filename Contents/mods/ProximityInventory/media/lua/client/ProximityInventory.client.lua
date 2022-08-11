@@ -11,14 +11,20 @@ local inventoryIcon = getTexture("media/ui/ProximityInventory.png")
 
 ProximityInventory = {}
 ProximityInventory.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
+ProximityInventory.bannedTypes = {
+	stove = true,
+	fridge = true,
+	freezer = true,
+	barbecue = true,
+	fireplace = true,
+	woodstove = true,
+	microwave = true,
+}
+
 ProximityInventory.canBeAdded = function (container)
-	-- Do not allow if it's an active stove or washer or similiar "Active things"
+	-- Do not allow if it's a stove or washer or similiar "Active things"
 	-- It can cause issues like the item stops cooking or stops drying
-	local object = container:getParent()
-	if not object then return true end
-	local result = object.isActivated and object:isActivated()
-	result = result or object.Activated and object:Activated()
-	return not result
+	return not ProximityInventory.bannedTypes[container:getType()]
 end
 
 function ISInventoryPage.GetLocalContainer(playerNum)
