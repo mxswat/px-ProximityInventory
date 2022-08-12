@@ -69,7 +69,7 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 		containerButton.capacity = 0
 	end
 
-        if container:getType() ~= "local" and ProximityInventory.canBeAdded(container) and not container:isLockedToCharacter(self.player) then
+	if container:getType() ~= "local" and ProximityInventory.canBeAdded(container) and not container:isLockedToCharacter(self.player) then
 		local localItems = localContainer:getItems()
 		local items = container:getItems()
 		localItems:addAll(items)
