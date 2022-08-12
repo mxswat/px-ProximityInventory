@@ -25,7 +25,7 @@ ProximityInventory.canBeAdded = function (container)
 	-- Do not allow if it's a stove or washer or similiar "Active things"
 	-- It can cause issues like the item stops cooking or stops drying
 
-	print(container:getType())
+	--print(container:getType())
 	return not ProximityInventory.bannedTypes[container:getType()]
 end
 
@@ -69,11 +69,11 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 		containerButton.capacity = 0
 	end
 
-	if container:getType() ~= "local" and ProximityInventory.canBeAdded(container) then
+        if container:getType() ~= "local" and ProximityInventory.canBeAdded(container) and not container:isLockedToCharacter(self.player) then
 		local localItems = localContainer:getItems()
 		local items = container:getItems()
 		localItems:addAll(items)
-	end
+        end
 
 	if container:getType() == "floor" then
 		ISInventoryPage.canInjectButton = true
