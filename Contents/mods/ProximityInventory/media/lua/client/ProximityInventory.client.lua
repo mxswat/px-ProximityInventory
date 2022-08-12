@@ -21,11 +21,15 @@ ProximityInventory.bannedTypes = {
 	microwave = true,
 }
 
-ProximityInventory.canBeAdded = function (container)
+ProximityInventory.canBeAdded = function (container, playerObj)
 	-- Do not allow if it's a stove or washer or similiar "Active things"
 	-- It can cause issues like the item stops cooking or stops drying
+	-- Also don't allow to see inside containers locked to you
+	local object = container:getParent()
+	if object and instanceof(object, "IsoThumpable") and object:isLockedToCharacter(playerObj) then
+		return false
+	end
 
-	--print(container:getType())
 	return not ProximityInventory.bannedTypes[container:getType()]
 end
 
@@ -69,11 +73,12 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 		containerButton.capacity = 0
 	end
 
-	if container:getType() ~= "local" and ProximityInventory.canBeAdded(container) and not container:isLockedToCharacter(self.player) then
+	local playerObj = getSpecificPlayer(self.player)
+	if container:getType() ~= "local" and ProximityInventory.canBeAdded(container, playerObj) then
 		local localItems = localContainer:getItems()
 		local items = container:getItems()
 		localItems:addAll(items)
-        end
+	end
 
 	if container:getType() == "floor" then
 		ISInventoryPage.canInjectButton = true
