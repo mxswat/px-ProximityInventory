@@ -20,6 +20,19 @@ ProximityInventory.bannedTypes = {
 	microwave = true,
 }
 
+ProximityInventory.containerCache = {}
+ProximityInventory.resetContainerCache = function ()
+	-- Removes the hightlight
+	for _, container in ipairs(ProximityInventory.containerCache) do
+		local isoObject = container:getParent()
+		if isoObject then
+			isoObject:setHighlighted(false);
+		end
+	end
+	-- Reset cache
+	ProximityInventory.containerCache = {}
+end
+
 ProximityInventory.canBeAdded = function (container, playerObj)
 	-- Do not allow if it's a stove or washer or similiar "Active things"
 	-- It can cause issues like the item stops cooking or stops drying
@@ -70,6 +83,7 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 	local localContainer = ISInventoryPage.GetLocalContainer(self.player)
 	if ISInventoryPage.canInjectButton then
 		ISInventoryPage.canInjectButton = false
+		ProximityInventory.resetContainerCache()
 
 		local title = "Proximity Inventory"
 		local containerButton = self:addContainerButton(localContainer, ProximityInventory.inventoryIcon, title, title)
@@ -79,6 +93,8 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 
 	local playerObj = getSpecificPlayer(self.player)
 	if container:getType() ~= "local" and ProximityInventory.canBeAdded(container, playerObj) then
+		-- GetGUID
+		table.insert(ProximityInventory.containerCache, container)
 		local localItems = localContainer:getItems()
 		local items = container:getItems()
 		localItems:addAll(items)
@@ -113,3 +129,19 @@ function ISInventoryPage:createChildren()
 
 	return result
 end
+
+local function OnTick()
+	if not ProximityInventory.isToggled then
+		return
+	end
+
+	for _, container in ipairs(ProximityInventory.containerCache) do
+		local isoObject = container:getParent()
+		if isoObject then
+			isoObject:setHighlighted(true);
+			isoObject:setHighlightColor(getCore():getObjectHighlitedColor());
+		end
+	end
+end
+
+Events.OnTick.Add(OnTick)
