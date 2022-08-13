@@ -114,11 +114,8 @@ function ISInventoryPage:createChildren()
 
 	if not self.onCharacter then
 		local lootButtonHeight = self:titleBarHeight()
-		local removeAllRight = self.removeAll:getRight();
-		local toggleStoveRight = self.toggleStove:getRight();
-		local rightOffset = math.max(removeAllRight, toggleStoveRight);
 
-		self.toggleProximityInv = ISButton:new(self.lootAll:getRight() + rightOffset + 16, 0, 50, lootButtonHeight, 'Toggle Proximity Inventory', self, ISInventoryPage.toggleProximityInv);
+		self.toggleProximityInv = ISButton:new(self.lootAll:getRight() + 16, 0, 50, lootButtonHeight, 'Toggle Proximity Inventory', self, ISInventoryPage.toggleProximityInv);
         self.toggleProximityInv:initialise();
         self.toggleProximityInv.borderColor.a = 0.0;
         self.toggleProximityInv.backgroundColor.a = 0.0;
@@ -127,6 +124,24 @@ function ISInventoryPage:createChildren()
         self.toggleProximityInv:setVisible(true);
 	end
 
+	return result
+end
+
+
+local old_ISInventoryPage_update = ISInventoryPage.update
+function ISInventoryPage:update()
+	local result = old_ISInventoryPage_update(self)
+	
+	if self.onCharacter then
+		return result
+	end
+
+	local removeAllRight = self.removeAll:getIsVisible() and self.removeAll:getRight() or 0;
+	local toggleStoveRight = self.toggleStove:getIsVisible() and self.toggleStove:getRight() or 0;
+	local rightOffset = Math.max(self.lootAll:getRight() + 16, removeAllRight + toggleStoveRight + 16)
+
+	self.toggleProximityInv:setX(rightOffset)
+	
 	return result
 end
 
