@@ -88,7 +88,7 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 		local title = "Proximity Inventory"
 		local containerButton = self:addContainerButton(localContainer, ProximityInventory.inventoryIcon, title, title)
 		containerButton.capacity = 0
-		self:setForceSelectedContainer(containerButton.inventory)
+		-- self:setForceSelectedContainer(containerButton.inventory)
 	end
 
 	local playerObj = getSpecificPlayer(self.player)
