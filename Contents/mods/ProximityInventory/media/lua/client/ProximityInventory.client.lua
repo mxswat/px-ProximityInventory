@@ -7,8 +7,6 @@ require "ISUI/ISLayoutManager"
 require "Definitions/ContainerButtonIcons"
 require "defines"
 
-local inventoryIcon = getTexture("media/ui/ProximityInventory.png")
-
 ProximityInventory = {}
 ProximityInventory.isToggled = false
 ProximityInventory.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
@@ -74,7 +72,7 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 		ISInventoryPage.canInjectButton = false
 
 		local title = "Proximity Inventory"
-		local containerButton = self:addContainerButton(localContainer, inventoryIcon, title, title)
+		local containerButton = self:addContainerButton(localContainer, ProximityInventory.inventoryIcon, title, title)
 		containerButton.capacity = 0
 		self:setForceSelectedContainer(containerButton.inventory)
 	end
