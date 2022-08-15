@@ -12,3 +12,4 @@ assignees: ''
 Do you have any other mod installed that affects loot?
 Do you have any other mod that affects the inventory?
 Do you get any errors in the console?
+Have you tried the mod without any other mod enabled?
