@@ -1,7 +1,6 @@
 version=1
 id=2847184718
 title=Proximity Inventory
-description=Are you tired of having to [i]manually[/i] loot a pile of 300 zombies to find some damn cigarettes?
 description=[h1] Proximity Inventory [/h1]
 description=
 description=Are you tired of having to [i]manually[/i] loot a pile of 300 zombies to find some damn cigarettes?
@@ -23,8 +22,9 @@ description=Enable Zombonly by enabling the extra mod "Zombonly" from the In-gam
 description=I suggest using this mod to make your life easier -> https://steamcommunity.com/sharedfiles/filedetails/?id=2694448564
 description=
 description=Features:
-description=Toggle -> Now, you have to toggle the proximity inventory on and off. (Check the screenshots, the one with the massive arrow)
+description=Toggle -> Now, you have to toggle the proximity inventory on and off. (Check the screenshots)
 description=Highlight -> when toggled, Proximity Inventory it will highlight all the containers loaded by the proximity inventory.
+description=Force Selected -> This options forces the Proximity Inventory to be always selected
 description=
 description=Limitations:
 description=Proximity Inventory cannot work with the following containers:
@@ -57,6 +57,5 @@ description=[h1] NO SUPPORT WILL BE PROVIDED IF YOU HAVE ISSUES AND YOU ARE USIN
 description=[h1] THIS MOD HAS BEEN TESTED IN *VANILLA* SP&MP[/h1]
 description=[h1] I WILL IGNORE COMMENTS ABOUT USING THIS MOD WITH OTHER MODS IN MULTIPLAYER; SERVER MISCONFIGURATION IS NOT MY RESPONSIBILITY [/h1]
 description=[h1] For real issues, use: https://github.com/mxswat/pz-ProximityInventory/issues [/h1]
-description=
 tags=Build 41;Balance;Building;Interface;Items;Misc;Multiplayer
 visibility=public
