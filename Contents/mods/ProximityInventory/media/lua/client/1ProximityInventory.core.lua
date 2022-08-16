@@ -1,5 +1,6 @@
 ProxInv = {}
 ProxInv.isToggled = true
+ProxInv.isForceSelected = false
 ProxInv.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
 ProxInv.bannedTypes = {
 	stove = true,
@@ -12,7 +13,11 @@ ProxInv.bannedTypes = {
 }
 ProxInv.toggleState = function ()
 	ProxInv.isToggled = not ProxInv.isToggled
-	-- This forces a refreshBackpacks call
+	ISInventoryPage.dirtyUI() -- This calls refreshBackpacks()
+end
+ProxInv.setForceSelected = function ()
+	ProxInv.isForceSelected = not ProxInv.isForceSelected
+	-- This is handled Inventory side
 	ISInventoryPage.dirtyUI()
 end
 ProxInv.isLocalContainerSelected = false
@@ -29,6 +34,12 @@ ProxInv.resetContainerCache = function ()
 	ProxInv.containerCache = {}
 end
 
+ProxInv.getTooltip = function ()
+	local text = "Right click for settings"
+	text = not ProxInv.isToggled and "Disabled - "..text or text
+	return text
+end
+
 ProxInv.canBeAdded = function (container, playerObj)
 	-- Do not allow if it's a stove or washer or similiar "Active things"
 	-- It can cause issues like the item stops cooking or stops drying
@@ -41,8 +52,13 @@ ProxInv.canBeAdded = function (container, playerObj)
 	return not ProxInv.bannedTypes[container:getType()]
 end
 
-ProxInv.populateContextMenuOptions = function (context, player)
+ProxInv.populateContextMenuOptions = function (context)
 	local toggleText = ProxInv.isToggled and "OFF" or "ON" 
-	local option = context:addOption("Toggle "..toggleText, ProxInv.isToggled, ProxInv.toggleState)
-	option.iconTexture = getTexture("media/ui/Panel_Icon_Gear.png");
+	local optToggle = context:addOption("Toggle "..toggleText, nil, ProxInv.toggleState)
+	-- option.iconTexture = getTexture("media/ui/Panel_Icon_Gear.png");
+	optToggle.iconTexture = ProxInv.inventoryIcon;
+
+	local forceSelText = ProxInv.isForceSelected and "Disable" or "Enable" 
+	local optForce = context:addOption(forceSelText.." Force Selected ", nil, ProxInv.setForceSelected)
+	optForce.iconTexture = ProxInv.inventoryIcon;
 end

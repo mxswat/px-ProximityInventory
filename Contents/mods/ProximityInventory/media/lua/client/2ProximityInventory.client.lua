@@ -7,11 +7,6 @@ require "ISUI/ISLayoutManager"
 require "Definitions/ContainerButtonIcons"
 require "defines"
 
-function ISInventoryPage:toggleProximityInv()
-	ProxInv.isToggled = not ProxInv.isToggled
-	self:refreshBackpacks()
-end
-
 function ISInventoryPage.GetLocalContainer(playerNum)
 	if ISInventoryPage.localContainer == nil then
 		ISInventoryPage.localContainer = {}
@@ -34,21 +29,24 @@ function ISInventoryPage.GetFloorContainer(playerNum)
 	return old_ISInventoryPage_GetFloorContainer(playerNum)
 end
 
-
 local old_ISInventoryPage_addContainerButton = ISInventoryPage.addContainerButton
 ISInventoryPage.canInjectButton = true;
 function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 	local resultButton = old_ISInventoryPage_addContainerButton(self, container, texture, name, tooltip)
 	local playerObj = getSpecificPlayer(self.player)
-	
-	-- Ignore all the other stuff
+	-- Ignore all the other stuff and return
 	if self.onCharacter or playerObj:getVehicle() then
 		return resultButton
 	end
 
+	if #self.backpacks == 0 then
+		-- clean cache
+		ProxInv.resetContainerCache()
+	end
+
 	local localContainer = ISInventoryPage.GetLocalContainer(self.player)
 
-	if container:getType() ~= "local" and ProxInv.canBeAdded(container, playerObj) then
+	if ProxInv.isToggled and container:getType() ~= "local" and ProxInv.canBeAdded(container, playerObj) then
 		table.insert(ProxInv.containerCache, container)
 		local localItems = localContainer:getItems()
 		local items = container:getItems()
@@ -56,12 +54,13 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 	end
 
 	if container:getType() == "floor" then
-		ProxInv.resetContainerCache()
 		local title = "Proximity Inv"
-		local _tooltip = "Right click for settings"
-		local proxInvButton = old_ISInventoryPage_addContainerButton(self, localContainer, ProxInv.inventoryIcon, title, _tooltip)
+		local proxInvButton = old_ISInventoryPage_addContainerButton(self, localContainer, ProxInv.inventoryIcon, title, ProxInv.getTooltip())
 		proxInvButton.capacity = 0
 		proxInvButton:setY(self:titleBarHeight() - 1)
+		if not ProxInv.isToggled then
+			table.remove(self.backpacks, #self.backpacks)
+		end
 	end
 
 	resultButton:setY(resultButton:getY() + self.buttonSize);
@@ -77,7 +76,7 @@ function ISInventoryPage:onBackpackRightMouseDown(x, y)
 
 	if container:getType() == "local" then
 		local context = ISContextMenu.get(page.player, getMouseX(), getMouseY())
-		ProxInv.populateContextMenuOptions(context, self.player)
+		ProxInv.populateContextMenuOptions(context, self)
 	end
 
 	return result
@@ -92,6 +91,10 @@ function ISInventoryPage:update()
 	end
 
 	ProxInv.isLocalContainerSelected = self.inventoryPane.inventory == ISInventoryPage.GetLocalContainer(self.player)
+
+	if ProxInv.isForceSelected then
+		self:setForceSelectedContainer(ISInventoryPage.GetLocalContainer(self.player))
+	end
 
 	return result
 end
