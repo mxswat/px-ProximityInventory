@@ -7,46 +7,8 @@ require "ISUI/ISLayoutManager"
 require "Definitions/ContainerButtonIcons"
 require "defines"
 
-ProximityInventory = {}
-ProximityInventory.isToggled = false
-ProximityInventory.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
-ProximityInventory.bannedTypes = {
-	stove = true,
-	fridge = true,
-	freezer = true,
-	barbecue = true,
-	fireplace = true,
-	woodstove = true,
-	microwave = true,
-}
-
-ProximityInventory.containerCache = {}
-ProximityInventory.resetContainerCache = function ()
-	-- Removes the hightlight
-	for _, container in ipairs(ProximityInventory.containerCache) do
-		local isoObject = container:getParent()
-		if isoObject then
-			isoObject:setHighlighted(false);
-		end
-	end
-	-- Reset cache
-	ProximityInventory.containerCache = {}
-end
-
-ProximityInventory.canBeAdded = function (container, playerObj)
-	-- Do not allow if it's a stove or washer or similiar "Active things"
-	-- It can cause issues like the item stops cooking or stops drying
-	-- Also don't allow to see inside containers locked to you
-	local object = container:getParent()
-	if object and instanceof(object, "IsoThumpable") and object:isLockedToCharacter(playerObj) then
-		return false
-	end
-
-	return not ProximityInventory.bannedTypes[container:getType()]
-end
-
 function ISInventoryPage:toggleProximityInv()
-	ProximityInventory.isToggled = not ProximityInventory.isToggled
+	ProxInv.isToggled = not ProxInv.isToggled
 	self:refreshBackpacks()
 end
 
@@ -76,25 +38,32 @@ end
 local old_ISInventoryPage_addContainerButton = ISInventoryPage.addContainerButton
 ISInventoryPage.canInjectButton = true;
 function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
-	if self.onCharacter or not ProximityInventory.isToggled then
+	if self.onCharacter then
 		return old_ISInventoryPage_addContainerButton(self, container, texture, name, tooltip)
 	end
 
 	local localContainer = ISInventoryPage.GetLocalContainer(self.player)
 	if ISInventoryPage.canInjectButton then
 		ISInventoryPage.canInjectButton = false
-		ProximityInventory.resetContainerCache()
+		ProxInv.resetContainerCache()
 
-		local title = "Proximity Inventory"
-		local containerButton = self:addContainerButton(localContainer, ProximityInventory.inventoryIcon, title, title)
+		local title = "Proximity Inv"
+		local tooltip = "Right click for settings"
+		local containerButton = self:addContainerButton(localContainer, ProxInv.inventoryIcon, title, tooltip)
 		containerButton.capacity = 0
-		-- self:setForceSelectedContainer(containerButton.inventory)
+
+		if not ProxInv.isToggled then
+			containerButton.onclick = nil
+			containerButton.onmousedown = nil
+			containerButton:setOnMouseOverFunction(nil)
+			containerButton:setOnMouseOutFunction(nil)
+			containerButton.textureOverride = getTexture("media/ui/lock.png")
+		end
 	end
 
 	local playerObj = getSpecificPlayer(self.player)
-	if container:getType() ~= "local" and ProximityInventory.canBeAdded(container, playerObj) then
-		-- GetGUID
-		table.insert(ProximityInventory.containerCache, container)
+	if container:getType() ~= "local" and ProxInv.canBeAdded(container, playerObj) then
+		table.insert(ProxInv.containerCache, container)
 		local localItems = localContainer:getItems()
 		local items = container:getItems()
 		localItems:addAll(items)
@@ -127,30 +96,45 @@ function ISInventoryPage:createChildren()
 	return result
 end
 
+local old_ISInventoryPage_onBackpackRightMouseDown = ISInventoryPage.onBackpackRightMouseDown
+function ISInventoryPage:onBackpackRightMouseDown(x, y)
+	local result = old_ISInventoryPage_onBackpackRightMouseDown(self, x, y)
+	local page = self.parent
+	local container = self.inventory
+
+	if container:getType() == "local" then
+		local context = ISContextMenu.get(page.player, getMouseX(), getMouseY())
+		ProxInv.populateContextMenuOptions(context, self.player)
+	end
+
+	return result
+end
 
 local old_ISInventoryPage_update = ISInventoryPage.update
 function ISInventoryPage:update()
 	local result = old_ISInventoryPage_update(self)
-	
+
 	if self.onCharacter then
 		return result
 	end
+
+	ProxInv.isLocalContainerSelected = self.inventoryPane.inventory == ISInventoryPage.GetLocalContainer(self.player)
 
 	local removeAllRight = self.removeAll:getIsVisible() and self.removeAll:getRight() or 0;
 	local toggleStoveRight = self.toggleStove:getIsVisible() and self.toggleStove:getRight() or 0;
 	local rightOffset = Math.max(self.lootAll:getRight() + 16, removeAllRight + toggleStoveRight + 16)
 
 	self.toggleProximityInv:setX(rightOffset)
-	
+
 	return result
 end
 
 local function OnTick()
-	if not ProximityInventory.isToggled then
+	if not ProxInv.isToggled or not ProxInv.isLocalContainerSelected then
 		return
 	end
 
-	for _, container in ipairs(ProximityInventory.containerCache) do
+	for _, container in ipairs(ProxInv.containerCache) do
 		local isoObject = container:getParent()
 		if isoObject then
 			isoObject:setHighlighted(true);

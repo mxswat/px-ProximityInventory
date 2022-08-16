@@ -7,12 +7,12 @@ require "ISUI/ISLayoutManager"
 require "Definitions/ContainerButtonIcons"
 require "defines"
 
-ProximityInventory.zombieTypes = {
+ProxInv.zombieTypes = {
 	inventoryfemale = true,
 	inventorymale = true,
 }
 
-ProximityInventory.canBeAdded = function (container)
+ProxInv.canBeAdded = function (container)
 	-- Only zombie Corpses
-	return ProximityInventory.zombieTypes[container:getType()]
+	return ProxInv.zombieTypes[container:getType()]
 end
