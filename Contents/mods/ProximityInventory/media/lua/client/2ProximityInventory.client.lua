@@ -38,30 +38,16 @@ end
 local old_ISInventoryPage_addContainerButton = ISInventoryPage.addContainerButton
 ISInventoryPage.canInjectButton = true;
 function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
-	if self.onCharacter then
-		return old_ISInventoryPage_addContainerButton(self, container, texture, name, tooltip)
+	local resultButton = old_ISInventoryPage_addContainerButton(self, container, texture, name, tooltip)
+	local playerObj = getSpecificPlayer(self.player)
+	
+	-- Ignore all the other stuff
+	if self.onCharacter or playerObj:getVehicle() then
+		return resultButton
 	end
 
 	local localContainer = ISInventoryPage.GetLocalContainer(self.player)
-	if ISInventoryPage.canInjectButton then
-		ISInventoryPage.canInjectButton = false
-		ProxInv.resetContainerCache()
 
-		local title = "Proximity Inv"
-		local tooltip = "Right click for settings"
-		local containerButton = self:addContainerButton(localContainer, ProxInv.inventoryIcon, title, tooltip)
-		containerButton.capacity = 0
-
-		if not ProxInv.isToggled then
-			containerButton.onclick = nil
-			containerButton.onmousedown = nil
-			containerButton:setOnMouseOverFunction(nil)
-			containerButton:setOnMouseOutFunction(nil)
-			containerButton.textureOverride = getTexture("media/ui/lock.png")
-		end
-	end
-
-	local playerObj = getSpecificPlayer(self.player)
 	if container:getType() ~= "local" and ProxInv.canBeAdded(container, playerObj) then
 		table.insert(ProxInv.containerCache, container)
 		local localItems = localContainer:getItems()
@@ -70,30 +56,17 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 	end
 
 	if container:getType() == "floor" then
-		ISInventoryPage.canInjectButton = true
+		ProxInv.resetContainerCache()
+		local title = "Proximity Inv"
+		local _tooltip = "Right click for settings"
+		local proxInvButton = old_ISInventoryPage_addContainerButton(self, localContainer, ProxInv.inventoryIcon, title, _tooltip)
+		proxInvButton.capacity = 0
+		proxInvButton:setY(self:titleBarHeight() - 1)
 	end
 
-	-- can't cache the result, otherwise the prox inv won't be the first item
-	return old_ISInventoryPage_addContainerButton(self, container, texture, name, tooltip)
-end
+	resultButton:setY(resultButton:getY() + self.buttonSize);
 
-local old_ISInventoryPage_createChildren = ISInventoryPage.createChildren
-function ISInventoryPage:createChildren()
-	local result = old_ISInventoryPage_createChildren(self)
-
-	if not self.onCharacter then
-		local lootButtonHeight = self:titleBarHeight()
-
-		self.toggleProximityInv = ISButton:new(self.lootAll:getRight() + 16, 0, 50, lootButtonHeight, 'Toggle Proximity Inventory', self, ISInventoryPage.toggleProximityInv);
-        self.toggleProximityInv:initialise();
-        self.toggleProximityInv.borderColor.a = 0.0;
-        self.toggleProximityInv.backgroundColor.a = 0.0;
-        self.toggleProximityInv.backgroundColorMouseOver.a = 0.7;
-        self:addChild(self.toggleProximityInv);
-        self.toggleProximityInv:setVisible(true);
-	end
-
-	return result
+	return resultButton
 end
 
 local old_ISInventoryPage_onBackpackRightMouseDown = ISInventoryPage.onBackpackRightMouseDown
@@ -119,12 +92,6 @@ function ISInventoryPage:update()
 	end
 
 	ProxInv.isLocalContainerSelected = self.inventoryPane.inventory == ISInventoryPage.GetLocalContainer(self.player)
-
-	local removeAllRight = self.removeAll:getIsVisible() and self.removeAll:getRight() or 0;
-	local toggleStoveRight = self.toggleStove:getIsVisible() and self.toggleStove:getRight() or 0;
-	local rightOffset = Math.max(self.lootAll:getRight() + 16, removeAllRight + toggleStoveRight + 16)
-
-	self.toggleProximityInv:setX(rightOffset)
 
 	return result
 end
