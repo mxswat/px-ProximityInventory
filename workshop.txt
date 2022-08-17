@@ -18,12 +18,12 @@ description=No more wasting time clicking and scrolling. Enjoy your loot FAST!
 description=
 description=Modes:
 description=Now with  "Zombonly" Mode! The usual Proximity inventory but limited to zombie corpses only!
-description=Enable Zombonly by enabling the extra mod "Zombonly" from the In-game mod Manager or Mod Manager Server
+description=Enable Zombonly by enabling the extra mod "Zombonly" from the In-game mod Manager or Mod Manager Server 
 description=I suggest using this mod to make your life easier -> https://steamcommunity.com/sharedfiles/filedetails/?id=2694448564
 description=
 description=Features:
 description=Toggle -> Now, you have to toggle the proximity inventory on and off. (Check the screenshots)
-description=Highlight -> When enabled, Proximity Inventory it will highlight all the containers loaded by the proximity inventory.
+description=Highlight -> when toggled, Proximity Inventory it will highlight all the containers loaded by the proximity inventory.
 description=Force Selected -> This options forces the Proximity Inventory to be always selected
 description=
 description=Limitations:
