@@ -1,4 +1,5 @@
-ProxInv = {}
+local ProxInv = {}
+
 ProxInv.isToggled = true
 ProxInv.isHighlightToggled = false
 ProxInv.isForceSelected = false
@@ -71,3 +72,5 @@ ProxInv.populateContextMenuOptions = function (context)
 	local optHightlight = context:addOption(highlightToggleText.." Hightlight", nil, ProxInv.setHighlightToggled)
 	optHightlight.iconTexture = ProxInv.inventoryIcon;
 end
+
+return ProxInv

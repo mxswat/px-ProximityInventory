@@ -1,11 +1,13 @@
-require "ISUI/ISPanel"
-require "ISUI/ISButton"
-require "ISUI/ISInventoryPane"
-require "ISUI/ISResizeWidget"
-require "ISUI/ISMouseDrag"
-require "ISUI/ISLayoutManager"
-require "Definitions/ContainerButtonIcons"
-require "defines"
+-- require "ISUI/ISPanel"
+-- require "ISUI/ISButton"
+-- require "ISUI/ISInventoryPane"
+-- require "ISUI/ISResizeWidget"
+-- require "ISUI/ISMouseDrag"
+-- require "ISUI/ISLayoutManager"
+-- require "Definitions/ContainerButtonIcons"
+-- require "defines"
+
+local ProxInv = require("ProximityInventory.core")
 
 function ISInventoryPage.GetLocalContainer(playerNum)
 	if ISInventoryPage.localContainer == nil then
