@@ -23,14 +23,6 @@ end
 ProxInv.isLocalContainerSelected = false
 ProxInv.containerCache = {}
 ProxInv.resetContainerCache = function ()
-	-- Removes the hightlight
-	for _, container in ipairs(ProxInv.containerCache) do
-		local isoObject = container:getParent()
-		if isoObject then
-			isoObject:setHighlighted(false);
-		end
-	end
-	-- Reset cache
 	ProxInv.containerCache = {}
 end
 
@@ -62,3 +54,11 @@ ProxInv.populateContextMenuOptions = function (context)
 	local optForce = context:addOption(forceSelText.." Force Selected ", nil, ProxInv.setForceSelected)
 	optForce.iconTexture = ProxInv.inventoryIcon;
 end
+
+-- Events.OnRefreshInventoryWindowContainers.Add(ProxInv.OnRefreshInventoryWindowContainers)
+-- ProxInv.OnRefreshInventoryWindowContainers = function(invInstance, state)
+--     if not invInstance.onCharacter then
+--         return
+-- 	end
+-- 	-- Test add button dynamically? 
+-- end

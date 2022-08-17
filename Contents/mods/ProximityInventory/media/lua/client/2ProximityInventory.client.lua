@@ -1,12 +1,3 @@
-require "ISUI/ISPanel"
-require "ISUI/ISButton"
-require "ISUI/ISInventoryPane"
-require "ISUI/ISResizeWidget"
-require "ISUI/ISMouseDrag"
-require "ISUI/ISLayoutManager"
-require "Definitions/ContainerButtonIcons"
-require "defines"
-
 function ISInventoryPage.GetLocalContainer(playerNum)
 	if ISInventoryPage.localContainer == nil then
 		ISInventoryPage.localContainer = {}
@@ -39,26 +30,27 @@ function ISInventoryPage:addContainerButton(container, texture, name, tooltip)
 		return resultButton
 	end
 
-	if #self.backpacks == 0 then
-		-- clean cache
-		ProxInv.resetContainerCache()
-	end
-
 	local localContainer = ISInventoryPage.GetLocalContainer(self.player)
-
-	if ProxInv.isToggled and container:getType() ~= "local" and ProxInv.canBeAdded(container, playerObj) then
-		table.insert(ProxInv.containerCache, container)
-		local localItems = localContainer:getItems()
-		local items = container:getItems()
-		localItems:addAll(items)
-	end
 
 	if container:getType() == "floor" then
 		local title = "Proximity Inv"
 		local proxInvButton = old_ISInventoryPage_addContainerButton(self, localContainer, ProxInv.inventoryIcon, title, ProxInv.getTooltip())
 		proxInvButton.capacity = 0
 		proxInvButton:setY(self:titleBarHeight() - 1)
-		if not ProxInv.isToggled then
+		
+		if ProxInv.isToggled then
+			ProxInv.resetContainerCache()
+			-- Add All backpacks content except last which is proxInv
+			for i = 1, (#self.backpacks - 1) do
+				local invToAdd = self.backpacks[i].inventory
+				if ProxInv.canBeAdded(invToAdd) then
+					local items = invToAdd:getItems()
+					proxInvButton.inventory:getItems():addAll(items)
+					table.insert(ProxInv.containerCache, invToAdd)
+				end
+			end
+		else
+			-- Remove the backpack from the list
 			table.remove(self.backpacks, #self.backpacks)
 		end
 	end
@@ -90,27 +82,28 @@ function ISInventoryPage:update()
 		return result
 	end
 
-	ProxInv.isLocalContainerSelected = self.inventoryPane.inventory == ISInventoryPage.GetLocalContainer(self.player)
-
 	if ProxInv.isForceSelected then
 		self:setForceSelectedContainer(ISInventoryPage.GetLocalContainer(self.player))
 	end
 
-	return result
-end
+	self.coloredProxInventories = self.coloredProxInventories or {}
 
-local function OnTick()
-	if not ProxInv.isToggled or not ProxInv.isLocalContainerSelected then
-		return
-	end
-
-	for _, container in ipairs(ProxInv.containerCache) do
-		local isoObject = container:getParent()
-		if isoObject then
-			isoObject:setHighlighted(true);
-			isoObject:setHighlightColor(getCore():getObjectHighlitedColor());
+	for _, container in ipairs(self.coloredProxInventories) do
+		if container:getParent() then
+			container:getParent():setHighlighted(false)
 		end
 	end
-end
+	table.wipe(self.coloredProxInventories)
 
-Events.OnTick.Add(OnTick)
+	if not self.isCollapsed and self.inventory:getType() == "local" then
+		for _, container in ipairs(ProxInv.containerCache) do
+			if container:getParent() and (instanceof(container:getParent(), "IsoObject") or instanceof(container:getParent(), "IsoDeadBody")) then
+				container:getParent():setHighlighted(true, false)
+				container:getParent():setHighlightColor(getCore():getObjectHighlitedColor())
+				table.insert(self.coloredProxInventories, container)
+			end
+		end
+	end
+
+	return result
+end
