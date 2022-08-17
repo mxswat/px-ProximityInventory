@@ -1,5 +1,6 @@
 ProxInv = {}
 ProxInv.isToggled = true
+ProxInv.isHighlightToggled = false
 ProxInv.isForceSelected = false
 ProxInv.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
 ProxInv.bannedTypes = {
@@ -13,6 +14,10 @@ ProxInv.bannedTypes = {
 }
 ProxInv.toggleState = function ()
 	ProxInv.isToggled = not ProxInv.isToggled
+	ISInventoryPage.dirtyUI() -- This calls refreshBackpacks()
+end
+ProxInv.setHighlightToggled = function ()
+	ProxInv.isHighlightToggled = not ProxInv.isHighlightToggled
 	ISInventoryPage.dirtyUI() -- This calls refreshBackpacks()
 end
 ProxInv.setForceSelected = function ()
@@ -59,6 +64,10 @@ ProxInv.populateContextMenuOptions = function (context)
 	optToggle.iconTexture = ProxInv.inventoryIcon;
 
 	local forceSelText = ProxInv.isForceSelected and "Disable" or "Enable" 
-	local optForce = context:addOption(forceSelText.." Force Selected ", nil, ProxInv.setForceSelected)
+	local optForce = context:addOption(forceSelText.." Force Selected", nil, ProxInv.setForceSelected)
 	optForce.iconTexture = ProxInv.inventoryIcon;
+
+	local highlightToggleText = ProxInv.isHighlightToggled and "Disable" or "Enable" 
+	local optHightlight = context:addOption(highlightToggleText.." Hightlight", nil, ProxInv.setHighlightToggled)
+	optHightlight.iconTexture = ProxInv.inventoryIcon;
 end

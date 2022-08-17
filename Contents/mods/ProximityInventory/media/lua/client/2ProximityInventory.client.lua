@@ -100,7 +100,7 @@ function ISInventoryPage:update()
 end
 
 local function OnTick()
-	if not ProxInv.isToggled or not ProxInv.isLocalContainerSelected then
+	if not ProxInv.isToggled or not ProxInv.isLocalContainerSelected or not ProxInv.isHighlightToggled then
 		return
 	end
 
