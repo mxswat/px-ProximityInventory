@@ -1,5 +1,6 @@
 ProxInv = {}
 ProxInv.isToggled = true
+ProxInv.isHighlightEnable = true
 ProxInv.isForceSelected = false
 ProxInv.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
 ProxInv.bannedTypes = {
@@ -17,7 +18,10 @@ ProxInv.toggleState = function ()
 end
 ProxInv.setForceSelected = function ()
 	ProxInv.isForceSelected = not ProxInv.isForceSelected
-	-- This is handled Inventory side
+	ISInventoryPage.dirtyUI()
+end
+ProxInv.setHighlightEnable = function ()
+	ProxInv.isHighlightEnable = not ProxInv.isHighlightEnable
 	ISInventoryPage.dirtyUI()
 end
 ProxInv.isLocalContainerSelected = false
@@ -51,9 +55,11 @@ ProxInv.populateContextMenuOptions = function (context)
 	-- option.iconTexture = getTexture("media/ui/Panel_Icon_Gear.png");
 	optToggle.iconTexture = ProxInv.inventoryIcon;
 
-	local forceSelectedText = ProxInv.isForceSelected and "Disable" or "Enable" 
-	local optForce = context:addOption(forceSelectedText.." Force Selected ", nil, ProxInv.setForceSelected)
-	optForce.iconTexture = ProxInv.inventoryIcon;
+	local forceSelectedText = ProxInv.isForceSelected and "Disable" or "Enable"
+	local optForce = context:addOption(forceSelectedText.." Force Selected", nil, ProxInv.setForceSelected)
+
+	local highlightText = ProxInv.isHighlightEnable and "Disable" or "Enable"
+	local optForce = context:addOption(highlightText.." Highlight", nil, ProxInv.setHighlightEnable)
 end
 
 ProxInv.OnButtonsAdded = function (invSelf)
