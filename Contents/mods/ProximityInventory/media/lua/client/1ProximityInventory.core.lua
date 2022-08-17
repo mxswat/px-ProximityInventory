@@ -21,6 +21,7 @@ ProxInv.setForceSelected = function ()
 	ISInventoryPage.dirtyUI()
 end
 ProxInv.isLocalContainerSelected = false
+ProxInv.buttonCache = nil
 ProxInv.containerCache = {}
 ProxInv.resetContainerCache = function ()
 	ProxInv.containerCache = {}
@@ -50,15 +51,68 @@ ProxInv.populateContextMenuOptions = function (context)
 	-- option.iconTexture = getTexture("media/ui/Panel_Icon_Gear.png");
 	optToggle.iconTexture = ProxInv.inventoryIcon;
 
-	local forceSelText = ProxInv.isForceSelected and "Disable" or "Enable" 
-	local optForce = context:addOption(forceSelText.." Force Selected ", nil, ProxInv.setForceSelected)
+	local forceSelectedText = ProxInv.isForceSelected and "Disable" or "Enable" 
+	local optForce = context:addOption(forceSelectedText.." Force Selected ", nil, ProxInv.setForceSelected)
 	optForce.iconTexture = ProxInv.inventoryIcon;
 end
 
--- Events.OnRefreshInventoryWindowContainers.Add(ProxInv.OnRefreshInventoryWindowContainers)
--- ProxInv.OnRefreshInventoryWindowContainers = function(invInstance, state)
---     if not invInstance.onCharacter then
---         return
--- 	end
--- 	-- Test add button dynamically? 
--- end
+ProxInv.OnButtonsAdded = function (invSelf)
+	local localContainer = ISInventoryPage.GetLocalContainer(invSelf.player)
+	localContainer:removeItemsFromProcessItems()
+	localContainer:clear()
+
+	local title = "Proximity Inv"
+	local proxInvButton = invSelf:addContainerButton(localContainer, ProxInv.inventoryIcon, title, ProxInv.getTooltip())
+	proxInvButton.capacity = 0
+	proxInvButton:setY(invSelf:titleBarHeight() - 1)
+	ProxInv.buttonCache = proxInvButton
+	ProxInv.resetContainerCache()
+
+	-- Add All backpacks content except last which is proxInv
+	for i = 1, (#invSelf.backpacks - 1) do
+		local buttonToPatch = invSelf.backpacks[i]
+		local invToAdd = invSelf.backpacks[i].inventory
+		if ProxInv.canBeAdded(invToAdd) then
+			local items = invToAdd:getItems()
+			proxInvButton.inventory:getItems():addAll(items)
+			table.insert(ProxInv.containerCache, invToAdd)
+		end
+		-- Since I'm looping here I might aswell also take care of patching all the buttons Y position
+		buttonToPatch:setY(buttonToPatch:getY() + invSelf.buttonSize)
+	end
+
+	if not ProxInv.isToggled then
+		-- Remove the backpack from the list
+		table.remove(invSelf.backpacks, #invSelf.backpacks)
+	end
+end
+
+ProxInv.OnBeginRefresh = function (invSelf)
+	-- This avoid the generation of multiple buttons when it's off
+	-- Since childrens gets removed via #invSelf.backpacks, and when it's toggled off the button does not appear
+	-- in the #invSelf.backpacks
+	if ProxInv.isToggled then
+		return
+	end
+	invSelf:removeChild(ProxInv.buttonCache)
+end
+
+ProxInv.OnRefreshInventoryWindowContainers = function(invSelf, state)
+	local playerObj = getSpecificPlayer(invSelf.player)
+    if invSelf.onCharacter or playerObj:getVehicle() then
+		-- Ignore character containers, as usual
+		-- Ignore in vehicles
+        return
+	end
+
+	if state == "begin" then
+		return ProxInv.OnBeginRefresh(invSelf)
+	end
+
+	if state == "buttonsAdded" then
+		return ProxInv.OnButtonsAdded(invSelf)
+	end
+	-- Test add button dynamically? 
+end
+
+Events.OnRefreshInventoryWindowContainers.Add(ProxInv.OnRefreshInventoryWindowContainers)
