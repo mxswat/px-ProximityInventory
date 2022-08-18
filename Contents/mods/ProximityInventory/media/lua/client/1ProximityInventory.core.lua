@@ -63,6 +63,8 @@ ProxInv.populateContextMenuOptions = function (context)
 end
 
 ProxInv.OnButtonsAdded = function (invSelf)
+	local playerObj = getSpecificPlayer(invSelf.player)
+
 	local localContainer = ISInventoryPage.GetLocalContainer(invSelf.player)
 	localContainer:removeItemsFromProcessItems()
 	localContainer:clear()
@@ -78,7 +80,7 @@ ProxInv.OnButtonsAdded = function (invSelf)
 	for i = 1, (#invSelf.backpacks - 1) do
 		local buttonToPatch = invSelf.backpacks[i]
 		local invToAdd = invSelf.backpacks[i].inventory
-		if ProxInv.canBeAdded(invToAdd, invSelf.player) then
+		if ProxInv.canBeAdded(invToAdd, playerObj) then
 			local items = invToAdd:getItems()
 			proxInvButton.inventory:getItems():addAll(items)
 			table.insert(ProxInv.containerCache, invToAdd)
