@@ -78,7 +78,7 @@ ProxInv.OnButtonsAdded = function (invSelf)
 	for i = 1, (#invSelf.backpacks - 1) do
 		local buttonToPatch = invSelf.backpacks[i]
 		local invToAdd = invSelf.backpacks[i].inventory
-		if ProxInv.canBeAdded(invToAdd) then
+		if ProxInv.canBeAdded(invToAdd, invSelf.player) then
 			local items = invToAdd:getItems()
 			proxInvButton.inventory:getItems():addAll(items)
 			table.insert(ProxInv.containerCache, invToAdd)
