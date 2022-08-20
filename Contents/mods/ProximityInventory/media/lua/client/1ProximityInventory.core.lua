@@ -3,15 +3,6 @@ ProxInv.isToggled = true
 ProxInv.isHighlightEnable = true
 ProxInv.isForceSelected = false
 ProxInv.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
-ProxInv.bannedTypes = {
-	stove = true,
-	fridge = true,
-	freezer = true,
-	barbecue = true,
-	fireplace = true,
-	woodstove = true,
-	microwave = true,
-}
 ProxInv.toggleState = function ()
 	ProxInv.isToggled = not ProxInv.isToggled
 	ISInventoryPage.dirtyUI() -- This calls refreshBackpacks()
@@ -46,7 +37,7 @@ ProxInv.canBeAdded = function (container, playerObj)
 		return false
 	end
 
-	return not ProxInv.bannedTypes[container:getType()]
+	return true
 end
 
 ProxInv.populateContextMenuOptions = function (context)
@@ -66,7 +57,6 @@ ProxInv.OnButtonsAdded = function (invSelf)
 	local playerObj = getSpecificPlayer(invSelf.player)
 
 	local localContainer = ISInventoryPage.GetLocalContainer(invSelf.player)
-	localContainer:removeItemsFromProcessItems()
 	localContainer:clear()
 
 	local title = "Proximity Inv"
