@@ -48,6 +48,7 @@ ProxInv.populateContextMenuOptions = function (context)
 
 	local forceSelectedText = ProxInv.isForceSelected and "Disable" or "Enable"
 	local optForce = context:addOption(forceSelectedText.." Force Selected", nil, ProxInv.setForceSelected)
+	optForce.iconTexture = getTexture("media/ui/Panel_Icon_Pin.png");
 
 	local highlightText = ProxInv.isHighlightEnable and "Disable" or "Enable"
 	local optForce = context:addOption(highlightText.." Highlight", nil, ProxInv.setHighlightEnable)
@@ -82,6 +83,10 @@ ProxInv.OnButtonsAdded = function (invSelf)
 	if not ProxInv.isToggled then
 		-- Remove the backpack from the list
 		table.remove(invSelf.backpacks, #invSelf.backpacks)
+	end
+
+	if ProxInv.isToggled and ProxInv.isForceSelected then
+		invSelf:setForceSelectedContainer(ISInventoryPage.GetLocalContainer(self.player))
 	end
 end
 

@@ -32,10 +32,6 @@ function ISInventoryPage:update()
 		return result
 	end
 
-	if ProxInv.isForceSelected then
-		self:setForceSelectedContainer(ISInventoryPage.GetLocalContainer(self.player))
-	end
-
 	self.coloredProxInventories = self.coloredProxInventories or {}
 
 	for _, container in ipairs(self.coloredProxInventories) do
