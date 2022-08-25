@@ -138,7 +138,7 @@ end
 
 local function OnKeyPressed(keynum)
 	local player = getSpecificPlayer(0)
-	if not player then
+	if not player or not ModOptions then
 		return
 	end
 
