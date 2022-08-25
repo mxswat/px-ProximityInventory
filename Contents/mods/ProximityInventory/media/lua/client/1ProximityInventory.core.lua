@@ -83,10 +83,18 @@ ProxInv.OnButtonsAdded = function (invSelf)
 	if not ProxInv.isToggled then
 		-- Remove the backpack from the list
 		table.remove(invSelf.backpacks, #invSelf.backpacks)
+		return
+	else
+
+	if ProxInv.isForceSelected then
+		invSelf:setForceSelectedContainer(ISInventoryPage.GetLocalContainer(self.player))
 	end
 
-	if ProxInv.isToggled and ProxInv.isForceSelected then
-		invSelf:setForceSelectedContainer(ISInventoryPage.GetLocalContainer(self.player))
+	if ProxInv.isAsFirst then
+		-- Remove from last
+		local proxInvButton = table.remove(invSelf.backpacks, #invSelf.backpacks)
+		-- Rebuild table and put it as first
+		invSelf.backpacks = {proxInvButton, table.unpack(invSelf.backpacks)}
 	end
 end
 
