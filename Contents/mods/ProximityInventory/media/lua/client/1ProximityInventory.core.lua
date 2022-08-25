@@ -3,32 +3,32 @@ ProxInv.isToggled = true
 ProxInv.isHighlightEnable = true
 ProxInv.isForceSelected = false
 ProxInv.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
-ProxInv.toggleState = function ()
+ProxInv.toggleState = function()
 	ProxInv.isToggled = not ProxInv.isToggled
 	ISInventoryPage.dirtyUI() -- This calls refreshBackpacks()
 end
-ProxInv.setForceSelected = function ()
+ProxInv.setForceSelected = function()
 	ProxInv.isForceSelected = not ProxInv.isForceSelected
 	ISInventoryPage.dirtyUI()
 end
-ProxInv.setHighlightEnable = function ()
+ProxInv.setHighlightEnable = function()
 	ProxInv.isHighlightEnable = not ProxInv.isHighlightEnable
 	ISInventoryPage.dirtyUI()
 end
 ProxInv.isLocalContainerSelected = false
 ProxInv.buttonCache = nil
 ProxInv.containerCache = {}
-ProxInv.resetContainerCache = function ()
+ProxInv.resetContainerCache = function()
 	ProxInv.containerCache = {}
 end
 
-ProxInv.getTooltip = function ()
+ProxInv.getTooltip = function()
 	local text = "Right click for settings"
-	text = not ProxInv.isToggled and "Disabled - "..text or text
+	text = not ProxInv.isToggled and "Disabled - " .. text or text
 	return text
 end
 
-ProxInv.canBeAdded = function (container, playerObj)
+ProxInv.canBeAdded = function(container, playerObj)
 	-- Do not allow if it's a stove or washer or similiar "Active things"
 	-- It can cause issues like the item stops cooking or stops drying
 	-- Also don't allow to see inside containers locked to you
@@ -40,21 +40,21 @@ ProxInv.canBeAdded = function (container, playerObj)
 	return true
 end
 
-ProxInv.populateContextMenuOptions = function (context)
-	local toggleText = ProxInv.isToggled and "OFF" or "ON" 
-	local optToggle = context:addOption("Toggle "..toggleText, nil, ProxInv.toggleState)
+ProxInv.populateContextMenuOptions = function(context)
+	local toggleText = ProxInv.isToggled and "OFF" or "ON"
+	local optToggle = context:addOption("Toggle " .. toggleText, nil, ProxInv.toggleState)
 	-- option.iconTexture = getTexture("media/ui/Panel_Icon_Gear.png");
 	optToggle.iconTexture = ProxInv.inventoryIcon;
 
 	local forceSelectedText = ProxInv.isForceSelected and "Disable" or "Enable"
-	local optForce = context:addOption(forceSelectedText.." Force Selected", nil, ProxInv.setForceSelected)
+	local optForce = context:addOption(forceSelectedText .. " Force Selected", nil, ProxInv.setForceSelected)
 	optForce.iconTexture = getTexture("media/ui/Panel_Icon_Pin.png");
 
 	local highlightText = ProxInv.isHighlightEnable and "Disable" or "Enable"
-	local optForce = context:addOption(highlightText.." Highlight", nil, ProxInv.setHighlightEnable)
+	local optForce = context:addOption(highlightText .. " Highlight", nil, ProxInv.setHighlightEnable)
 end
 
-ProxInv.OnButtonsAdded = function (invSelf)
+ProxInv.OnButtonsAdded = function(invSelf)
 	local playerObj = getSpecificPlayer(invSelf.player)
 
 	local localContainer = ISInventoryPage.GetLocalContainer(invSelf.player)
@@ -84,10 +84,10 @@ ProxInv.OnButtonsAdded = function (invSelf)
 		-- Remove the backpack from the list
 		table.remove(invSelf.backpacks, #invSelf.backpacks)
 		return
-	else
+	end
 
-	if ProxInv.isForceSelected then
-		invSelf:setForceSelectedContainer(ISInventoryPage.GetLocalContainer(self.player))
+	if ProxInv.isToggled and ProxInv.isForceSelected then
+		invSelf:setForceSelectedContainer(ISInventoryPage.GetLocalContainer(invSelf.player))
 	end
 
 	if ProxInv.isAsFirst then
@@ -98,7 +98,7 @@ ProxInv.OnButtonsAdded = function (invSelf)
 	end
 end
 
-ProxInv.OnBeginRefresh = function (invSelf)
+ProxInv.OnBeginRefresh = function(invSelf)
 	-- This avoid the generation of multiple buttons when it's off
 	-- Since childrens gets removed via #invSelf.backpacks, and when it's toggled off the button does not appear
 	-- in the #invSelf.backpacks
@@ -110,10 +110,10 @@ end
 
 ProxInv.OnRefreshInventoryWindowContainers = function(invSelf, state)
 	local playerObj = getSpecificPlayer(invSelf.player)
-    if invSelf.onCharacter or playerObj:getVehicle() then
+	if invSelf.onCharacter or playerObj:getVehicle() then
 		-- Ignore character containers, as usual
 		-- Ignore in vehicles
-        return
+		return
 	end
 
 	if state == "begin" then
@@ -123,7 +123,29 @@ ProxInv.OnRefreshInventoryWindowContainers = function(invSelf, state)
 	if state == "buttonsAdded" then
 		return ProxInv.OnButtonsAdded(invSelf)
 	end
-	-- Test add button dynamically? 
 end
 
 Events.OnRefreshInventoryWindowContainers.Add(ProxInv.OnRefreshInventoryWindowContainers)
+
+local KEY_ForceSelected = {
+	name = "ProxInv_Force_Selected",
+	key = Keyboard.KEY_NUMPAD0,
+}
+
+if ModOptions and ModOptions.AddKeyBinding then
+	ModOptions:AddKeyBinding("[Hotkeys]", KEY_ForceSelected)
+end
+
+local function OnKeyPressed(keynum)
+	local player = getSpecificPlayer(0)
+	if not player then
+		return
+	end
+
+	if keynum == KEY_ForceSelected.key then
+		ProxInv.setForceSelected()
+		return
+	end
+end
+
+Events.OnKeyPressed.Add(OnKeyPressed)
