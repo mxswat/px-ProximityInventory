@@ -144,6 +144,8 @@ local function OnKeyPressed(keynum)
 
 	if keynum == KEY_ForceSelected.key then
 		ProxInv.setForceSelected()
+		local text = getText("IGUI_ProxInv_Force_Selected")..(ProxInv.isForceSelected and "ON" or "OFF")
+		HaloTextHelper.addText(player, text, HaloTextHelper.getColorWhite())
 		return
 	end
 end

@@ -1,0 +1,3 @@
+IGUI_EN = {
+    IGUI_ProxInv_Force_Selected = "Prox Inv Force Selected: ",
+}
