@@ -91,7 +91,7 @@ ProxInv.OnButtonsAdded = function(invSelf)
 	end
 
 	if ProxInv.isAsFirst then
-		-- Am I even using this code???
+		-- TODO: Am I even using this code???
 		-- Remove from last
 		local proxInvButton = table.remove(invSelf.backpacks, #invSelf.backpacks)
 		-- Rebuild table and put it as first
