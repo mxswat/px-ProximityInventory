@@ -91,10 +91,11 @@ ProxInv.OnButtonsAdded = function(invSelf)
 	end
 
 	if ProxInv.isAsFirst then
+		-- Am I even using this code???
 		-- Remove from last
 		local proxInvButton = table.remove(invSelf.backpacks, #invSelf.backpacks)
 		-- Rebuild table and put it as first
-		invSelf.backpacks = {proxInvButton, table.unpack(invSelf.backpacks)}
+		invSelf.backpacks = { proxInvButton, table.unpack(invSelf.backpacks) }
 	end
 end
 
@@ -144,10 +145,39 @@ local function OnKeyPressed(keynum)
 
 	if keynum == KEY_ForceSelected.key then
 		ProxInv.setForceSelected()
-		local text = getText("IGUI_ProxInv_Force_Selected")..(ProxInv.isForceSelected and "ON" or "OFF")
+		local text = getText("IGUI_ProxInv_Force_Selected") .. (ProxInv.isForceSelected and "ON" or "OFF")
 		HaloTextHelper.addText(player, text, HaloTextHelper.getColorWhite())
 		return
 	end
 end
 
 Events.OnKeyPressed.Add(OnKeyPressed)
+
+local old_ISCraftingUI_getContainers = ISCraftingUI.getContainers
+function ISCraftingUI:getContainers()
+	local result = old_ISCraftingUI_getContainers(self)
+	if not self.character or not ProxInv.isToggled then
+		return result
+	end
+
+	-- If ProxInv is enabled:
+	local proxInvContainer = getPlayerLoot(self.playerNum).inventoryPane.inventoryPage.backpacks[1].inventory
+	self.containerList:remove(proxInvContainer);
+	return result
+end
+
+local old_ISInventoryPaneContextMenu_getContainers = ISInventoryPaneContextMenu.getContainers
+ISInventoryPaneContextMenu.getContainers = function(character)
+	if not character or not ProxInv.isToggled then
+		return old_ISInventoryPaneContextMenu_getContainers(character)
+	end
+	
+	local containerList = old_ISInventoryPaneContextMenu_getContainers(character)
+	local playerNum = character and character:getPlayerNum() or -1;
+
+	-- If ProxInv is enabled:
+	local proxInvContainer = getPlayerLoot(playerNum).inventoryPane.inventoryPage.backpacks[1].inventory
+	containerList:remove(proxInvContainer);
+
+	return containerList;
+end
