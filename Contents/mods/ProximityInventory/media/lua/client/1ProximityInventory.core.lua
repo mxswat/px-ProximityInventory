@@ -161,8 +161,8 @@ function ISCraftingUI:getContainers()
 	end
 
 	-- If ProxInv is enabled:
-	local proxInvContainer = getPlayerLoot(self.playerNum).inventoryPane.inventoryPage.backpacks[1].inventory
-	self.containerList:remove(proxInvContainer);
+	local localContainer = ISInventoryPage.GetLocalContainer(self.playerNum)
+	self.containerList:remove(localContainer);
 	return result
 end
 
@@ -173,11 +173,9 @@ ISInventoryPaneContextMenu.getContainers = function(character)
 	end
 	
 	local containerList = old_ISInventoryPaneContextMenu_getContainers(character)
-	local playerNum = character and character:getPlayerNum() or -1;
-
+	local localContainer = ISInventoryPage.GetLocalContainer(character:getPlayerNum())
 	-- If ProxInv is enabled:
-	local proxInvContainer = getPlayerLoot(playerNum).inventoryPane.inventoryPage.backpacks[1].inventory
-	containerList:remove(proxInvContainer);
+	containerList:remove(localContainer);
 
 	return containerList;
 end
