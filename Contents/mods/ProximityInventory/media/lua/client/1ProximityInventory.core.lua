@@ -77,7 +77,7 @@ ProxInv.OnButtonsAdded = function(invSelf)
 			table.insert(ProxInv.containerCache, invToAdd)
 		end
 		-- Since I'm looping here I might aswell also take care of patching all the buttons Y position
-		buttonToPatch:setY(buttonToPatch:getY() + invSelf.buttonSize)
+		buttonToPatch:setY(buttonToPatch:getY() + buttonToPatch:getHeight())
 	end
 
 	if not ProxInv.isToggled then
