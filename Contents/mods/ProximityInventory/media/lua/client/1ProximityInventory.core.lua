@@ -28,11 +28,21 @@ ProxInv.getTooltip = function()
 	return text
 end
 
+ProxInv.zombieTypes = {
+	inventoryfemale = true,
+	inventorymale = true,
+}
+
 ProxInv.canBeAdded = function(container, playerObj)
 	-- Do not allow if it's a stove or washer or similiar "Active things"
 	-- It can cause issues like the item stops cooking or stops drying
 	-- Also don't allow to see inside containers locked to you
 	local object = container:getParent()
+
+  if SandboxVars.ProxInv.ZombieOnly then
+    return ProxInv.zombieTypes[container:getType()]
+  end
+
 	if object and instanceof(object, "IsoThumpable") and object:isLockedToCharacter(playerObj) then
 		return false
 	end

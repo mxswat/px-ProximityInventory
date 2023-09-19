@@ -1,6 +1,0 @@
-name=Proximity Inventory Zombonly
-id=ProximityInventoryZombonly
-description=Proximity Inventory optionl addon. Zombie corspe only mode. Requires the main mod
-poster=poster.png
-icon=icon.png
-require=ProximityInventory
