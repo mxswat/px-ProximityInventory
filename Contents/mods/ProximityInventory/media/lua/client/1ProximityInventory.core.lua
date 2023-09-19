@@ -144,7 +144,7 @@ local KEY_ForceSelected = {
 }
 
 if ModOptions and ModOptions.AddKeyBinding then
-	ModOptions:AddKeyBinding("[Hotkeys]", KEY_ForceSelected)
+	ModOptions:AddKeyBinding("[ProximityInventory]", KEY_ForceSelected)
 end
 
 local function OnKeyPressed(keynum)
