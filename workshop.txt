@@ -39,6 +39,8 @@ description=Can be added mid-game on a server
 description=
 description=For Donations:
 description=https://paypal.me/massimomxUK
+description=Extra Credits:
+description=- JS for improved icons and translation
 description=
 description=Permissions:
 description=[quote=author]Ask for permission
