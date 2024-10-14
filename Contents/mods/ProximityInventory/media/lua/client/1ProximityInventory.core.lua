@@ -3,6 +3,8 @@ ProxInv.isToggled = true
 ProxInv.isHighlightEnable = true
 ProxInv.isForceSelected = false
 ProxInv.inventoryIcon = getTexture("media/ui/ProximityInventory.png")
+ProxInv.forceSelectIcon = getTexture("media/ui/Panel_Icon_Pin.png")
+ProxInv.highlightIcon = getTexture("media/textures/Item_LightBulb.png")
 ProxInv.toggleState = function()
 	ProxInv.isToggled = not ProxInv.isToggled
 	ISInventoryPage.dirtyUI() -- This calls refreshBackpacks()
@@ -23,9 +25,11 @@ ProxInv.resetContainerCache = function()
 end
 
 ProxInv.getTooltip = function()
-	local text = "Right click for settings"
-	text = not ProxInv.isToggled and "Disabled - " .. text or text
-	return text
+	if ProxInv.isToggled then
+		return getText("IGUI_ProxInv_Tooltip_ToggleOn")
+	else
+		return getText("IGUI_ProxInv_Tooltip_ToggleOff")
+	end
 end
 
 ProxInv.zombieTypes = {
@@ -39,9 +43,9 @@ ProxInv.canBeAdded = function(container, playerObj)
 	-- Also don't allow to see inside containers locked to you
 	local object = container:getParent()
 
-  if SandboxVars.ProxInv.ZombieOnly then
-    return ProxInv.zombieTypes[container:getType()]
-  end
+	if SandboxVars.ProxInv.ZombieOnly then
+		return ProxInv.zombieTypes[container:getType()]
+	end
 
 	if object and instanceof(object, "IsoThumpable") and object:isLockedToCharacter(playerObj) then
 		return false
@@ -51,17 +55,23 @@ ProxInv.canBeAdded = function(container, playerObj)
 end
 
 ProxInv.populateContextMenuOptions = function(context)
-	local toggleText = ProxInv.isToggled and "OFF" or "ON"
-	local optToggle = context:addOption("Toggle " .. toggleText, nil, ProxInv.toggleState)
-	-- option.iconTexture = getTexture("media/ui/Panel_Icon_Gear.png");
-	optToggle.iconTexture = ProxInv.inventoryIcon;
+	local toggleText = ProxInv.isToggled
+		and getText("IGUI_ProxInv_Context_ToggleOn")
+		or getText("IGUI_ProxInv_Context_ToggleOff")
+	local optToggle = context:addOption(toggleText, nil, ProxInv.toggleState)
+	optToggle.iconTexture = ProxInv.isToggled and ProxInv.inventoryIcon or nil
 
-	local forceSelectedText = ProxInv.isForceSelected and "Disable" or "Enable"
-	local optForce = context:addOption(forceSelectedText .. " Force Selected", nil, ProxInv.setForceSelected)
-	optForce.iconTexture = getTexture("media/ui/Panel_Icon_Pin.png");
+	local forceSelectedText = ProxInv.isForceSelected
+		and getText("IGUI_ProxInv_Context_ForceSelectOn")
+		or getText("IGUI_ProxInv_Context_ForceSelectOff")
+	local optForce = context:addOption(forceSelectedText, nil, ProxInv.setForceSelected)
+	optForce.iconTexture = ProxInv.isForceSelected and ProxInv.forceSelectIcon or nil
 
-	local highlightText = ProxInv.isHighlightEnable and "Disable" or "Enable"
-	local optForce = context:addOption(highlightText .. " Highlight", nil, ProxInv.setHighlightEnable)
+	local highlightText = ProxInv.isHighlightEnable
+		and getText("IGUI_ProxInv_Context_HighlightOn")
+		or getText("IGUI_ProxInv_Context_HighlightOff")
+	local optHighlight = context:addOption(highlightText, nil, ProxInv.setHighlightEnable)
+	optHighlight.iconTexture = ProxInv.isHighlightEnable and ProxInv.highlightIcon or nil
 end
 
 ProxInv.OnButtonsAdded = function(invSelf)
@@ -70,7 +80,7 @@ ProxInv.OnButtonsAdded = function(invSelf)
 	local localContainer = ISInventoryPage.GetLocalContainer(invSelf.player)
 	localContainer:clear()
 
-	local title = "Proximity Inv"
+	local title = getText("IGUI_ProxInv_InventoryName")
 	local proxInvButton = invSelf:addContainerButton(localContainer, ProxInv.inventoryIcon, title, ProxInv.getTooltip())
 	proxInvButton.capacity = 0
 	proxInvButton:setY(invSelf:titleBarHeight() - 1)
@@ -155,7 +165,9 @@ local function OnKeyPressed(keynum)
 
 	if keynum == KEY_ForceSelected.key then
 		ProxInv.setForceSelected()
-		local text = getText("IGUI_ProxInv_Force_Selected") .. (ProxInv.isForceSelected and "ON" or "OFF")
+		local text = ProxInv.isForceSelected
+			and getText("IGUI_ProxInv_Text_ForceSelectOn")
+			or getText("IGUI_ProxInv_Text_ForceSelectOff")
 		HaloTextHelper.addText(player, text, HaloTextHelper.getColorWhite())
 		return
 	end
@@ -181,7 +193,7 @@ ISInventoryPaneContextMenu.getContainers = function(character)
 	if not character or not ProxInv.isToggled then
 		return old_ISInventoryPaneContextMenu_getContainers(character)
 	end
-	
+
 	local containerList = old_ISInventoryPaneContextMenu_getContainers(character)
 	local localContainer = ISInventoryPage.GetLocalContainer(character:getPlayerNum())
 	-- If ProxInv is enabled:
