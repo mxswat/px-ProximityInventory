@@ -18,3 +18,22 @@ function ProximityInventory.GetVirtualContainer(invSelf)
 	return ProximityInventory.virtualContainers[playerNum]
 end
 
+---@param invSelf ISInventoryPage
+function ProximityInventory.OnButtonsAdded(invSelf)
+  
+end
+
+Events.OnRefreshInventoryWindowContainers.Add(function (invSelf, state)
+	if invSelf.onCharacter then
+		-- Ignore character containers, as usual
+		return
+	end
+
+	if state == "begin" then
+		return ProximityInventory.OnBeginRefresh(invSelf)
+	end
+
+	if state == "buttonsAdded" then
+		return ProximityInventory.OnButtonsAdded(invSelf)
+	end
+end)
