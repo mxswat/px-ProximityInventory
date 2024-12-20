@@ -129,6 +129,13 @@ function ProximityInventory.OnButtonsAdded(invSelf)
   end
 end
 
+function ProximityInventory.OnToggle()
+  ProximityInventory.isEnabled:setValue(not ProximityInventory.isEnabled:getValue())
+  PZAPI.ModOptions:save()
+
+  ISInventoryPage.dirtyUI() -- Let's force a reset of the UI
+end
+
 function ProximityInventory.OnToggleForceSelected()
   local playerNum = 0
   local player = getSpecificPlayer(playerNum)
@@ -144,9 +151,13 @@ function ProximityInventory.OnToggleForceSelected()
 end
 
 Events.OnKeyPressed.Add(function(key)
-  if key ~= ProximityInventory.toggleForceSelectedOption:getValue() or not getPlayer() then return end
-
-  ProximityInventory.OnToggleForceSelected()
+  if not getPlayer() then return end
+  if key == ProximityInventory.toggleForceSelectedOption:getValue() then
+    return ProximityInventory.OnToggleForceSelected()
+  end
+  if key == ProximityInventory.toggleEnabledOption:getValue() then
+    return ProximityInventory.OnToggle()
+  end
 end);
 
 
