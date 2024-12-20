@@ -1,3 +1,5 @@
+local ProximityInventory = require("ProximityInventory/ProximityInventory")
+
 local old_ISInventoryPage_update = ISInventoryPage.update
 function ISInventoryPage:update()
   old_ISInventoryPage_update(self)
@@ -8,26 +10,25 @@ function ISInventoryPage:update()
   -- but just injecting the table is is SOO much simpler, so I'll just inject it here
   self.coloredProxInventories = self.coloredProxInventories or {}
 
-  for _, container in ipairs(self.coloredProxInventories) do
-    local parent = container:getParent()
+  for i=#self.coloredProxInventories, 1, -1 do
+    local parent = self.coloredProxInventories[i]:getParent()
     if parent then
       parent:setHighlighted(false)
       parent:setOutlineHighlight(false);
       parent:setOutlineHlAttached(false);
     end
+    self.coloredProxInventories[i]=nil
   end
-
-  table.wipe(self.coloredProxInventories)
 
   if not ProximityInventory.isHighlightEnableOption:getValue() or self.isCollapsed or self.inventory:getType() ~= "proxInv" then return end
 
-  for _, button in ipairs(self.backpacks) do
-    local container = button.inventory
+  for i=1, #self.backpacks do
+    local container = self.backpacks[i].inventory
     local parent = container:getParent()
     if parent and (instanceof(parent, "IsoObject") or instanceof(parent, "IsoDeadBody")) then
       parent:setHighlighted(true, false)
       parent:setHighlightColor(getCore():getObjectHighlitedColor())
-      table.insert(self.coloredProxInventories, container)
+      self.coloredProxInventories[#self.coloredProxInventories+1] = container
     end
   end
 end
