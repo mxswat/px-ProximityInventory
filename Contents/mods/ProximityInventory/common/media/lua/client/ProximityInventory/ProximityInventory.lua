@@ -1,4 +1,4 @@
-ProximityInventory = ProximityInventory or {}
+local ProximityInventory = {}
 
 -- Options
 ProximityInventory.options = PZAPI.ModOptions:create("ProximityInventory", "Proximity Inventory")
@@ -176,3 +176,5 @@ Events.OnRefreshInventoryWindowContainers.Add(function(invSelf, state)
     return ProximityInventory.OnButtonsAdded(invSelf)
   end
 end)
+
+return ProximityInventory
